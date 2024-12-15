@@ -8,8 +8,7 @@ import {
   doc,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
-import UsersResetVotes from "@/components/usersResetVotes";
-import CandidatesResetVotes from "@/components/CandidatesResetVotes";
+import ResetVotes from "@/components/ResetVotes";
 
 interface User {
   id: string;
@@ -121,8 +120,7 @@ const UserManagement: React.FC = () => {
             <option value="active">المستخدمون النشطون</option>
             <option value="inactive">المستخدمون غير النشطين</option>
           </select>
-          <UsersResetVotes/>
-          <CandidatesResetVotes/>
+          <ResetVotes/>
           
         </div>
 
