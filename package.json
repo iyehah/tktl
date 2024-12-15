@@ -1,6 +1,14 @@
 {
   "name": "tktl",
-  "version": "0.1.0",
+  "version": "1.1.0",
+  "description": "A web application for a youth initiative, providing functionalities for managing elections, tracking votes, and visualizing results.",
+  "author": "Iyehah Mhamed <iyehah@gmail.com>",
+  "contributors": [
+    {
+      "name": "Mohamed Soueilem",
+      "email": "msoueilem@miu.edu"
+    }
+  ],
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -25,5 +33,18 @@
     "postcss": "^8",
     "tailwindcss": "^3.4.1",
     "typescript": "^5.7.2"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/tktl.git"
+  },
+  "license": "MIT",
+  "keywords": [
+    "nextjs",
+    "firebase",
+    "tailwindcss",
+    "chartjs",
+    "election",
+    "voting"
+  ]
 }
