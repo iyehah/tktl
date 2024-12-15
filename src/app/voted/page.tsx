@@ -12,6 +12,7 @@ interface Candidate {
   Votes: number;
   Description: string;
   photoUrl: string;
+  voters: string[];
 }
 
 const VotedPage = () => {
@@ -77,6 +78,8 @@ const VotedPage = () => {
   }, [router]);
 
   const handleVote = async () => {
+    const candidate = candidates.find((c) => c.id === selectedCandidate);
+    
     if (!selectedCandidate) {
       alert("Please select a candidate to vote for.");
       return;
@@ -89,14 +92,31 @@ const VotedPage = () => {
       return;
     }
 
-    if (userVoted) {
+    const userRef = doc(db, "users", userId);
+    const userSnapshot = (await getDoc(userRef)).data();
+    const candidateRef = doc(db, "candidates", selectedCandidate);
+    const candidateSnapshot = (await getDoc(candidateRef)).data();
+    // console.log("candidateVoters", candidateSnapshot);
+    // console.log("user", userSnapshot);
+    
+    if (!userSnapshot || !candidateSnapshot) {
+      alert("An error occurred. Please try again.");
+      router.push("/voted");
+      return;
+    }
+    
+    const candidateVoters = candidateSnapshot?.voters || [];
+
+    if (userSnapshot.Voted && candidateVoters.includes(userId) && !userSnapshot.Candidate) {
       alert("You have already voted.");
       return;
     }
-
+    
     try {
-      const userRef = doc(db, "users", userId);
-      await updateDoc(userRef, { Voted: true });
+      candidateVoters.push(userId);
+      await updateDoc(userRef, { Voted: true, Candidate: candidate?.Name });
+      await updateDoc(candidateRef, { voters: candidateVoters });
+
 
       localStorage.setItem("selectedCandidate", selectedCandidate);
       router.push("/send");
@@ -143,8 +163,10 @@ const VotedPage = () => {
               <p>تم تسجيل تصويتك بنجاح! شكراً لمشاركتك.</p>
             </div>
           )}
-
-          {candidates.map((candidate) => (
+          // i want to sert the candidates by id
+          {candidates
+          .sort((a, b) => (a.id > b.id ? 1 : -1))
+          .map((candidate) => (
             <div
               key={candidate.id}
               className="bg-white shadow-md rounded-lg p-4 mb-4 flex items-center justify-between"
