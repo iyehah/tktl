@@ -5,6 +5,7 @@ import { db } from "@/lib/firebase";
 import { doc, getDoc, collection, getDocs, updateDoc, query, orderBy } from "firebase/firestore";
 import Header from "@/components/Header";
 import { useRouter } from "next/navigation";
+import { getFunctions, httpsCallable } from "firebase/functions";
 
 interface Candidate {
   id: string;
@@ -95,11 +96,19 @@ const VotedPage = () => {
     }
 
     try {
-      const userRef = doc(db, "users", userId);
-      await updateDoc(userRef, { Voted: true });
+      const functions = getFunctions();
+      const handleVoteFunction = httpsCallable(functions, 'handleVote');
 
-      localStorage.setItem("selectedCandidate", selectedCandidate);
-      router.push("/send");
+      // Call the Cloud Function
+      const result = await handleVoteFunction({ userId, selectedCandidate });
+      const data = result.data as { success: boolean };
+      if (data.success) {
+        alert("Your vote has been recorded successfully. Thank you for participating!");
+      } else {
+        console.error("Error during voting:", result);
+      }
+      // localStorage.setItem("selectedCandidate", selectedCandidate);
+      // router.push("/send");
     } catch (err) {
       console.error("Error during voting:", err);
       alert("An error occurred. Please try again.");
@@ -127,7 +136,7 @@ const VotedPage = () => {
       <div className="min-h-screen flex flex-col items-center bg-gray-100 p-4" dir="rtl">
         <h1 className="text-4xl font-bold mb-6 text-center">المرشحون</h1>
         <div className="w-full max-w-3xl">
-        {status === "beforeStart" && (
+          {status === "beforeStart" && (
             <div className="bg-yellow-100 text-yellow-800 p-4 rounded-lg text-center mb-2">
               <p>التصويت لم يبدأ بعد. سيبدأ : {startTime?.toLocaleString()}</p>
             </div>
@@ -172,9 +181,8 @@ const VotedPage = () => {
               {!userVoted && status === "voting" && (
                 <button
                   onClick={() => setSelectedCandidate(candidate.id)}
-                  className={`px-4 py-2 ${
-                    selectedCandidate === candidate.id ? "bg-green-500" : "bg-red-500"
-                  } text-white rounded hover:bg-yellow-500 transition`}
+                  className={`px-4 py-2 ${selectedCandidate === candidate.id ? "bg-green-500" : "bg-red-500"
+                    } text-white rounded hover:bg-yellow-500 transition`}
                 >
                   {selectedCandidate === candidate.id ? "تم الإختيار" : "اختيار"}
                 </button>
