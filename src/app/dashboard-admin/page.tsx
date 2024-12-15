@@ -50,6 +50,8 @@ const Dashboard: React.FC = () => {
         ...doc.data(),
       })) as User[];
       setUsers(usersList);
+
+      // console.log("Users fetched:", usersList);
     } catch (error) {
       console.error("Error fetching users:", error);
     }
