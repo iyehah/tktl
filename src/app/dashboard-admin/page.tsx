@@ -20,11 +20,27 @@ const Dashboard: React.FC = () => {
     return () => unsubscribe();
   }, [router]);
 
+  // Récupérer les utilisateurs depuis Firestore
+  const fetchUsers = async () => {
+    try {
+      const usersSnapshot = await getDocs(collection(db, "users"));
+      const usersList = usersSnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      })) as User[];
+      setUsers(usersList);
+
+      // console.log("Users fetched:", usersList);
+    } catch (error) {
+      console.error("Error fetching users:", error);
+    }
+
   // Handle tab change
   const handleTabChange = (tab: string) => {
     setTabAdminValue(tab);
     // Save the active tab to localStorage
     localStorage.setItem("activeTab", tab);
+
   };
 
   useEffect(() => {

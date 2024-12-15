@@ -19,13 +19,15 @@ const CandidatesChart = () => {
     try {
       const candidatesRef = collection(db, "candidates");
       const snapshot = await getDocs(candidatesRef);
-
       const candidateNames: string[] = [];
       const candidateVotes: number[] = [];
       const candidatePhotos: string[] = [];
 
       snapshot.forEach((doc) => {
         const data = doc.data();
+        data.id = doc.id;
+        // console.log("Candidates data fetched:", data);
+
         candidateNames.push(data.Name);
         candidateVotes.push(data.Votes);
         candidatePhotos.push(data.photoUrl);
@@ -92,18 +94,18 @@ const CandidatesChart = () => {
     <div dir="rtl" className="flex flex-col items-center justify-center w-full p-6">
       <div className="bg-white p-6 rounded shadow-lg w-full max-w-6xl">
         <div className="flex border-b border-gray-300 mb-4">
-          
+
           <button
             className={`py-2 px-4 ${activeTab === "images" ? "bg-green-500 text-white" : "text-black-500"}`}
             onClick={() => handleTabChange("images")}
           >
-            بدون الرسم البياني 
+            بدون الرسم البياني
           </button>
           <button
             className={`py-2 px-4 ${activeTab === "chart" ? "bg-green-500 text-white" : "text-black-500"}`}
             onClick={() => handleTabChange("chart")}
           >
-             مع الرسم البياني 
+            مع الرسم البياني
           </button>
         </div>
 
