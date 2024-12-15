@@ -163,7 +163,7 @@ const VotedPage = () => {
               <p>تم تسجيل تصويتك بنجاح! شكراً لمشاركتك.</p>
             </div>
           )}
-          // i want to sert the candidates by id
+          
           {candidates
           .sort((a, b) => (a.id > b.id ? 1 : -1))
           .map((candidate) => (
