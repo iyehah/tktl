@@ -25,6 +25,7 @@ const CandidatesChart = () => {
 
       snapshot.forEach((doc) => {
         const data = doc.data();
+        data.id = doc.id;
         // console.log("Candidates data fetched:", data);
 
         candidateNames.push(data.Name);
