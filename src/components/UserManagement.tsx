@@ -6,6 +6,7 @@ import {
   updateDoc,
   deleteDoc,
   doc,
+  getDoc,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import ResetVotes from "@/components/ResetVotes";
@@ -27,6 +28,12 @@ interface JsonUsers {
 }
 
 const typeJsonUsers = (jsonUsers as unknown) as JsonUsers;
+const candidatesIds : {[key: string] : number} = {
+  "محمد عبد الرحمن محمد" : 1,
+  "محمد فال محمد عبدالله خطري" : 2,
+  "محمد المصطفى الشيخ السجاد" : 3,
+  "حيادي" : 4,
+};
 
 const UserManagement: React.FC = () => {
   const [users, setUsers] = useState<User[]>([]);
@@ -100,6 +107,50 @@ const UserManagement: React.FC = () => {
       (activeFilter === "not-voted" && !user.Voted);
     return matchesNumber && matchesActive;
   });
+
+  function handleShowUserPassword(id: string): void {
+    alert(`LOGGING USER INFORMATION AND PASSWORD: \nPassword: ${users.find((user) => user.id === id)?.Password}`);
+  }
+
+  async function handleResetVoting(id: string) {
+    console.log("Function not implemented.", id);
+    /**
+     * 1. Set the Voted field to false
+     * 2. Set the Candidate field to an empty string
+     * 3. Update the user in the database
+     * 4. In candidate, remove the user id from the voters list
+     * 5. Decrement candidate votes by 1
+     * 6. Update the candidate in the database
+     */
+
+    if (window.confirm("هل أنت متأكد أنك تريد إعادة تصويت هذا المستخدم؟")) {
+      try {
+        const userDoc = doc(db, "users", id);
+        const user = users.find((user) => user.id === id);
+        const candidateId = candidatesIds[user?.Candidate as string];
+        await updateDoc(userDoc, { Voted: false, Candidate: "" });
+
+        const candidateDoc = doc(db, "candidates", candidateId.toString());
+        const candidateSnapshot = await getDoc(candidateDoc);
+        const candidateData = candidateSnapshot.data();
+        let voters = candidateData?.voters as string[];
+        console.log("Voters: before resetting", voters);
+        voters = voters.filter((id) => id !== user?.id);
+
+        console.log("Voters: after resetting", voters);
+
+        await updateDoc(candidateDoc, { Votes: candidateData?.Votes - 1, voters: voters });
+
+        console.log("User voting reset successfully! \nCandidate id:",candidateId);
+        setMessage("تم إعادة تصويت هذا المستخدم بنجاح!");
+        setTimeout(() => setMessage(null), 3000);
+      } catch (error) {
+        console.error("Error deleting user:", error);
+        setMessage("حدث خطأ أثناء إعادة تصويت هذا المستخدم.");
+        setTimeout(() => setMessage(null), 3000);
+      }
+    }
+  }
 
   return (
     <>
@@ -187,6 +238,20 @@ const UserManagement: React.FC = () => {
                   >
                     حذف
                   </button>
+                  <button
+                    onClick={() => handleShowUserPassword(user.id)}
+                    className="bg-red-500 text-white px-2 py-1 rounded mr-1"
+                  >
+                    كلمة المرور
+                  </button>
+                  {user.Voted && (
+                  <button
+                    onClick={() => handleResetVoting(user.id)}
+                    className="bg-red-500 text-white px-2 py-1 rounded mr-1"
+                  >
+                    إعادة التصويت
+                  </button>
+                  )}
                 </td>
               </tr>
             ))}
