@@ -9,6 +9,9 @@ import {
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import ResetVotes from "@/components/ResetVotes";
+import jsonUsers from "../app/dashboard-admin/phone-to-name.json" ;
+
+// console.log(jsonUsers);
 
 interface User {
   id: string;
@@ -16,13 +19,20 @@ interface User {
   Password: string;
   Voted: boolean;
   Active: boolean; // Champ actif
+  Candidate: string;
 }
+
+interface JsonUsers {
+  [key: number]: string;
+}
+
+const typeJsonUsers = (jsonUsers as unknown) as JsonUsers;
 
 const UserManagement: React.FC = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [searchNumber, setSearchNumber] = useState("");
   const [showPasswords, setShowPasswords] = useState(false); 
-  const [activeFilter, setActiveFilter] = useState<"all" | "active" | "inactive">("all"); 
+  const [activeFilter, setActiveFilter] = useState<"all" | "active" | "inactive" | "voters" | "not-voted">("all"); 
   const [message, setMessage] = useState<string | null>(null);
 
   
@@ -85,7 +95,9 @@ const UserManagement: React.FC = () => {
     const matchesActive =
       activeFilter === "all" ||
       (activeFilter === "active" && user.Active) ||
-      (activeFilter === "inactive" && !user.Active);
+      (activeFilter === "inactive" && !user.Active) || 
+      (activeFilter === "voters" && user.Voted) ||
+      (activeFilter === "not-voted" && !user.Voted);
     return matchesNumber && matchesActive;
   });
 
@@ -113,12 +125,14 @@ const UserManagement: React.FC = () => {
           <select
             id="activeFilter"
             value={activeFilter}
-            onChange={(e) => setActiveFilter(e.target.value as "all" | "active" | "inactive")}
+            onChange={(e) => setActiveFilter(e.target.value as "all" | "active" | "inactive" | "voters" | "not-voted")}
             className="border p-2 rounded focus:outline-none focus:ring-2 focus:ring-green-50 focus:border-green-200"
           >
             <option value="all">جميع المستخدمين</option>
             <option value="active">المستخدمون النشطون</option>
             <option value="inactive">المستخدمون غير النشطين</option>
+            <option value="voters">المستخدمون الذين صوتوا</option>
+            <option value="not-voted">المستخدمون الذين لم يصوتوا بعد</option>
           </select>
           <ResetVotes/>
           
@@ -136,19 +150,23 @@ const UserManagement: React.FC = () => {
         <table className="table-auto w-full border-collapse border border-gray-300 text-center">
           <thead>
             <tr className="bg-green-500 text-white">
+              <th className="border px-1 py-2">الإسم الكامل</th>
               <th className="border px-1 py-2">الرقم</th>
-              <th className="border px-1 py-2">كلمة المرور</th>
+              <th className="border px-1 py-2">صوت للمرشح</th>
               <th className="border px-1 py-2">هل صوت؟</th>
               <th className="border px-1 py-2">الحالة</th>
               <th className="border px-1 py-2">الإجراءات</th>
             </tr>
           </thead>
           <tbody>
-            {filteredUsers.map((user) => (
+            {filteredUsers
+              .sort((a, b) => (a.Voted === b.Voted ? 0 : a.Voted ? 1 : -1))
+              .map((user) => (
               <tr key={user.id}>
+                <td className="border px-1 py-2">{typeJsonUsers[user.Number]}</td>
                 <td className="border px-1 py-2">{user.Number}</td>
                 <td className="border px-1 py-2">
-                  {showPasswords ? user.Password : "•".repeat(user.Password.length)}
+                  {user.Voted ? user.Candidate : "لم يصوت بعد"}
                 </td>
                 <td className="border px-1 py-2">{user.Voted ? "نعم" : "لا"}</td>
                 <td className="border px-1 py-2">{user.Active ? "نشط" : "غير نشط"}</td>
