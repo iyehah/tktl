@@ -25,10 +25,10 @@ const DashboardLogin = () => {
       const user = userCredential.user;
 
       localStorage.setItem("userId", user.uid);
-      console.log("تم تسجيل دخول المستخدم:", user);
+      // console.log("تم تسجيل دخول المستخدم:", user);
       router.push("/dashboard-admin");
     } catch (err: any) {
-      console.error("خطأ أثناء تسجيل الدخول:", err);
+      // console.error("خطأ أثناء تسجيل الدخول:", err);
       setError("البريد الإلكتروني أو كلمة المرور غير صحيحة. يرجى المحاولة مرة أخرى.");
     }
   };

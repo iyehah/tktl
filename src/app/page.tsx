@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { db } from "@/lib/firebase";
 import { doc, getDoc, getDocs, collection } from "firebase/firestore"; // Use getDoc for fetching individual documents
+// import { doc, getDoc, getDocs, collection, updateDoc } from "firebase/firestore"; // Use getDoc for fetching individual documents
 import Header from "@/components/Header";
 import CandidatesChart from "@/components/result"; // استيراد مخطط المرشحين
 import CandidateImages from "@/components/CandidateImages";
@@ -56,6 +57,42 @@ export default function Home() {
       const votes = snapshot.docs.filter((doc) => doc.data().Voted === true).length;
       const actives = snapshot.docs.filter((doc) => doc.data().Active === true).length;
       const nonVotes = total - votes;
+
+
+      // ALL THIS CODE IS COMMENTED OUT BECAUSE IT'S NOT NEEDED (USEDED BEFORE TO SPOT DUPLICATE VOTES)
+      // const users = snapshot.docs.map((doc) => {
+      //   const data = doc.data();
+      //   data.id = doc.id;
+      //   // console.log("User:", data);
+      //   return data
+      // });
+
+      // const candidates = collection(db, "candidates");
+      // const candidatesSnapshot = await getDocs(candidates);
+      // const candidatesList = candidatesSnapshot.docs.map((doc) => doc.data());
+      // // console.log("Candidates:", candidatesList);
+      // // console.log("Users:", users);
+      // var candidateVotes : string[] = [];
+      // var candidateIds = candidatesSnapshot.docs.map((doc) => doc.id);
+      // candidatesList.forEach((candidate) => {
+      //   candidateVotes = users.filter((user) => {
+      //     // console.log(`Trying to compare ${user.Candidate} with ${candidate.Name}`);
+      //     return user.Candidate === candidate.Name
+      //   }).map((user) => {
+      //     // console.log(`User ${user.Number} voted for ${user.Candidate} \nUser: ${user}`);
+      //     return user.id
+      //   });
+      //   console.log(`${candidate.Name}: and total votes ${candidate.Votes}`);
+      //   // console.log("User voters:", candidateVotes);
+      //   // console.log("Candidate voters:", candidate.voters);
+      //   // console.log("Missing ids in User voters  from candidate voters:", candidate.voters.filter((id: string) => candidateVotes.indexOf(id) === -1));
+      //   // logging all the duplicate ids in candidate.voters
+      //   console.log("Duplicate ids in candidate voters:", candidate.voters.filter((id: string, index: number) => candidate.voters.indexOf(id) !== index));
+      // });
+
+      // for (let id of candidateIds) {
+      //   await updateDoc(doc(db, "candidates", id), { voters: candidateVotes![id] });
+      // }
 
       setTotalUsers(total);
       setTotalActives(actives);

@@ -6,9 +6,13 @@ import {
   updateDoc,
   deleteDoc,
   doc,
+  getDoc,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import ResetVotes from "@/components/ResetVotes";
+import jsonUsers from "../app/dashboard-admin/users.json" ;
+
+// console.log(jsonUsers);
 
 interface User {
   id: string;
@@ -16,13 +20,42 @@ interface User {
   Password: string;
   Voted: boolean;
   Active: boolean; // Champ actif
+  Candidate: string;
 }
+
+interface JsonUsers {
+  number: string;
+  name: string;
+  id: string;
+}
+
+interface typedJsonUsersType {
+  [key: string]: string;
+}
+
+const jsonUsersArray = (jsonUsers as unknown) as JsonUsers[];
+const typeJsonUsers : typedJsonUsersType  = {};
+
+for (const key in jsonUsersArray) {
+  const user = jsonUsersArray[key];
+  // console.log(`User: \nName: ${user.name} \nNumber: ${user.number}`);
+  typeJsonUsers[user.number] = user.name;
+}
+
+// console.log(typeJsonUsers);
+
+const candidatesIds : {[key: string] : number} = {
+  "محمد عبد الرحمن محمد" : 1,
+  "محمد فال محمد عبدالله خطري" : 2,
+  "محمد المصطفى الشيخ السجاد" : 3,
+  "حيادي" : 4,
+};
 
 const UserManagement: React.FC = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [searchNumber, setSearchNumber] = useState("");
   const [showPasswords, setShowPasswords] = useState(false); 
-  const [activeFilter, setActiveFilter] = useState<"all" | "active" | "inactive">("all"); 
+  const [activeFilter, setActiveFilter] = useState<"all" | "active" | "inactive" | "voters" | "not-voted">("all"); 
   const [message, setMessage] = useState<string | null>(null);
 
   
@@ -85,9 +118,55 @@ const UserManagement: React.FC = () => {
     const matchesActive =
       activeFilter === "all" ||
       (activeFilter === "active" && user.Active) ||
-      (activeFilter === "inactive" && !user.Active);
+      (activeFilter === "inactive" && !user.Active) || 
+      (activeFilter === "voters" && user.Voted) ||
+      (activeFilter === "not-voted" && !user.Voted);
     return matchesNumber && matchesActive;
   });
+
+  function handleShowUserPassword(id: string): void {
+    alert(`LOGGING USER INFORMATION AND PASSWORD: \nPassword: ${users.find((user) => user.id === id)?.Password}`);
+  }
+
+  async function handleResetVoting(id: string) {
+    console.log("Function not implemented.", id);
+    /**
+     * 1. Set the Voted field to false
+     * 2. Set the Candidate field to an empty string
+     * 3. Update the user in the database
+     * 4. In candidate, remove the user id from the voters list
+     * 5. Decrement candidate votes by 1
+     * 6. Update the candidate in the database
+     */
+
+    if (window.confirm("هل أنت متأكد أنك تريد إعادة تصويت هذا المستخدم؟")) {
+      try {
+        const userDoc = doc(db, "users", id);
+        const user = users.find((user) => user.id === id);
+        const candidateId = candidatesIds[user?.Candidate as string];
+        await updateDoc(userDoc, { Voted: false, Candidate: "" });
+
+        const candidateDoc = doc(db, "candidates", candidateId.toString());
+        const candidateSnapshot = await getDoc(candidateDoc);
+        const candidateData = candidateSnapshot.data();
+        let voters = candidateData?.voters as string[];
+        console.log("Voters: before resetting", voters);
+        voters = voters.filter((id) => id !== user?.id);
+
+        console.log("Voters: after resetting", voters);
+
+        await updateDoc(candidateDoc, { Votes: candidateData?.Votes - 1, voters: voters });
+
+        console.log("User voting reset successfully! \nCandidate id:",candidateId);
+        setMessage("تم إعادة تصويت هذا المستخدم بنجاح!");
+        setTimeout(() => setMessage(null), 3000);
+      } catch (error) {
+        console.error("Error deleting user:", error);
+        setMessage("حدث خطأ أثناء إعادة تصويت هذا المستخدم.");
+        setTimeout(() => setMessage(null), 3000);
+      }
+    }
+  }
 
   return (
     <>
@@ -113,12 +192,14 @@ const UserManagement: React.FC = () => {
           <select
             id="activeFilter"
             value={activeFilter}
-            onChange={(e) => setActiveFilter(e.target.value as "all" | "active" | "inactive")}
+            onChange={(e) => setActiveFilter(e.target.value as "all" | "active" | "inactive" | "voters" | "not-voted")}
             className="border p-2 rounded focus:outline-none focus:ring-2 focus:ring-green-50 focus:border-green-200"
           >
             <option value="all">جميع المستخدمين</option>
             <option value="active">المستخدمون النشطون</option>
             <option value="inactive">المستخدمون غير النشطين</option>
+            <option value="voters">المستخدمون الذين صوتوا</option>
+            <option value="not-voted">المستخدمون الذين لم يصوتوا بعد</option>
           </select>
           <ResetVotes/>
           
@@ -136,19 +217,23 @@ const UserManagement: React.FC = () => {
         <table className="table-auto w-full border-collapse border border-gray-300 text-center">
           <thead>
             <tr className="bg-green-500 text-white">
+              <th className="border px-1 py-2 text-right">الإسم الكامل</th>
               <th className="border px-1 py-2">الرقم</th>
-              <th className="border px-1 py-2">كلمة المرور</th>
+              <th className="border px-1 py-2">صوت للمرشح</th>
               <th className="border px-1 py-2">هل صوت؟</th>
               <th className="border px-1 py-2">الحالة</th>
               <th className="border px-1 py-2">الإجراءات</th>
             </tr>
           </thead>
           <tbody>
-            {filteredUsers.map((user) => (
+            {filteredUsers
+              .sort((a, b) => (a.Voted === b.Voted ? 0 : a.Voted ? 1 : -1))
+              .map((user) => (
               <tr key={user.id}>
+                <td className="border px-1 py-2 text-right">{typeJsonUsers[user.Number]}</td>
                 <td className="border px-1 py-2">{user.Number}</td>
                 <td className="border px-1 py-2">
-                  {showPasswords ? user.Password : "•".repeat(user.Password.length)}
+                  {user.Voted ? user.Candidate : "لم يصوت بعد"}
                 </td>
                 <td className="border px-1 py-2">{user.Voted ? "نعم" : "لا"}</td>
                 <td className="border px-1 py-2">{user.Active ? "نشط" : "غير نشط"}</td>
@@ -169,6 +254,20 @@ const UserManagement: React.FC = () => {
                   >
                     حذف
                   </button>
+                  <button
+                    onClick={() => handleShowUserPassword(user.id)}
+                    className="bg-red-500 text-white px-2 py-1 rounded mr-1"
+                  >
+                    كلمة المرور
+                  </button>
+                  {user.Voted && (
+                  <button
+                    onClick={() => handleResetVoting(user.id)}
+                    className="bg-red-500 text-white px-2 py-1 rounded mr-1"
+                  >
+                    إعادة التصويت
+                  </button>
+                  )}
                 </td>
               </tr>
             ))}
