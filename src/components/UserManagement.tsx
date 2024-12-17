@@ -10,7 +10,7 @@ import {
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import ResetVotes from "@/components/ResetVotes";
-import jsonUsers from "../app/dashboard-admin/phone-to-name.json" ;
+import jsonUsers from "../app/dashboard-admin/users.json" ;
 
 // console.log(jsonUsers);
 
@@ -24,10 +24,26 @@ interface User {
 }
 
 interface JsonUsers {
-  [key: number]: string;
+  number: string;
+  name: string;
+  id: string;
 }
 
-const typeJsonUsers = (jsonUsers as unknown) as JsonUsers;
+interface typedJsonUsersType {
+  [key: string]: string;
+}
+
+const jsonUsersArray = (jsonUsers as unknown) as JsonUsers[];
+const typeJsonUsers : typedJsonUsersType  = {};
+
+for (const key in jsonUsersArray) {
+  const user = jsonUsersArray[key];
+  // console.log(`User: \nName: ${user.name} \nNumber: ${user.number}`);
+  typeJsonUsers[user.number] = user.name;
+}
+
+// console.log(typeJsonUsers);
+
 const candidatesIds : {[key: string] : number} = {
   "محمد عبد الرحمن محمد" : 1,
   "محمد فال محمد عبدالله خطري" : 2,
@@ -201,7 +217,7 @@ const UserManagement: React.FC = () => {
         <table className="table-auto w-full border-collapse border border-gray-300 text-center">
           <thead>
             <tr className="bg-green-500 text-white">
-              <th className="border px-1 py-2">الإسم الكامل</th>
+              <th className="border px-1 py-2 text-right">الإسم الكامل</th>
               <th className="border px-1 py-2">الرقم</th>
               <th className="border px-1 py-2">صوت للمرشح</th>
               <th className="border px-1 py-2">هل صوت؟</th>
@@ -214,7 +230,7 @@ const UserManagement: React.FC = () => {
               .sort((a, b) => (a.Voted === b.Voted ? 0 : a.Voted ? 1 : -1))
               .map((user) => (
               <tr key={user.id}>
-                <td className="border px-1 py-2">{typeJsonUsers[user.Number]}</td>
+                <td className="border px-1 py-2 text-right">{typeJsonUsers[user.Number]}</td>
                 <td className="border px-1 py-2">{user.Number}</td>
                 <td className="border px-1 py-2">
                   {user.Voted ? user.Candidate : "لم يصوت بعد"}
