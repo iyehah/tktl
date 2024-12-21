@@ -5,11 +5,13 @@ import { useRouter } from "next/navigation";
 import { db } from "@/lib/firebase";
 import { doc, getDoc } from "firebase/firestore";
 import LoginForm from "@/components/LoginForm";
-
+import Profile from "@/components/Profile";
+import { CgLogIn,CgUser ,CgUserList,CgLogOut } from "react-icons/cg";
 const Header = () => {
   const [userId, setUserId] = useState<string | null>(null);
   const [userVoted, setUserVoted] = useState(false);
-  const [showLoginForm, setShowLoginForm] = useState(false); 
+  const [showLoginForm, setShowLoginForm] = useState(false);
+  const [showProfile, setShowProfile] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -46,24 +48,30 @@ const Header = () => {
   };
 
   const toggleLoginForm = () => setShowLoginForm((prev) => !prev);
+  const toggleProfile = () => setShowProfile((prev) => !prev);
 
   return (
     <header className="w-full bg-gray-50 text-black p-2 flex justify-between items-center" dir="rtl">
-        <div className="flex items-center cursor-pointer" onClick={() => router.push("/")}>
+      <div className="flex items-center cursor-pointer" onClick={() => router.push("/")}>
         <img src="/logo.png" alt="الشعار" className="w-16 h-16 ml-4" />
         <h1 className="text-2xl text-black font-bold">التكــتل الشبابي</h1>
       </div>
-      <div>
+      <div className="flex items-center justify-between"> 
         {userId ? (
           <>
-            {/* <span className="mr-4">{userVoted ? "لقد قمت بالتصويت" : "لم تصوت بعد"}</span> */}
+            <button
+              onClick={toggleProfile}
+              className="bg-green-500 px-4 py-2 ml-1 rounded text-white hover:bg-green-600 transition duration-300"
+            >
+              {showProfile ? <CgUser size={22}/> : <CgUserList size={22}/>}
+            </button>
+            {showProfile && <Profile userId={userId} setShowProfile={setShowProfile} />}
             <button
               onClick={handleLogout}
               className="bg-red-500 px-4 py-2 rounded text-white hover:bg-red-600 transition duration-300"
             >
-              تسجيل الخروج
+              <CgLogOut size={22}/>
             </button>
-                
           </>
         ) : (
           <>
@@ -71,9 +79,8 @@ const Header = () => {
               onClick={toggleLoginForm}
               className="bg-green-500 px-4 py-2 rounded text-white hover:bg-green-600 transition duration-300"
             >
-              تسجيل الدخول
+              <CgLogIn size={22}/>
             </button>
-            {/* نموذج تسجيل الدخول */}
             {showLoginForm && <LoginForm onClose={toggleLoginForm} />}
           </>
         )}
