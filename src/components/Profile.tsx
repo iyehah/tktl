@@ -12,8 +12,6 @@ interface ProfileProps {
 
 const Profile: React.FC<ProfileProps> = ({ userId, setShowProfile }) => {
   const [userInfo, setUserInfo] = useState<any>(null);
-  const [userName, setUserName] = useState<string | null>(null);
-  const [userID, setUserID] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchUserInfo = async () => {
@@ -21,15 +19,7 @@ const Profile: React.FC<ProfileProps> = ({ userId, setShowProfile }) => {
         const userDoc = doc(db, "users", userId);
         const userSnapshot = await getDoc(userDoc);
         if (userSnapshot.exists()) {
-          const userData = userSnapshot.data();
-          setUserInfo(userData);
-
-          // Fetch users.json and find the name corresponding to the number
-          const response = await fetch("/users.json");
-          const users = await response.json();
-          const user = users.find((u: { number: string }) => u.number === String(userData.Number));
-          setUserName(user?.name || "!غير معروف");
-          setUserID(user?.id || "!غير معروف");
+          setUserInfo(userSnapshot.data());
         } else {
           console.error("No such user!");
         }
@@ -37,7 +27,6 @@ const Profile: React.FC<ProfileProps> = ({ userId, setShowProfile }) => {
         console.error("Error fetching user info:", err);
       }
     };
-
     fetchUserInfo();
   }, [userId]);
 
@@ -66,10 +55,7 @@ const Profile: React.FC<ProfileProps> = ({ userId, setShowProfile }) => {
               <span className="font-semibold">معرف الحساب:</span> {userId}
             </p>
             <p className="mb-2 border-b pb-2 flex justify-between items-center">
-              <span className="font-semibold">اسم المنتسب:</span> {userName}
-            </p>
-            <p className="mb-2 border-b pb-2 flex justify-between items-center">
-              <span className="font-semibold">رقم التعريف :</span> {userID}
+              <span className="font-semibold">اسم المنتسب:</span> {userInfo.Name}
             </p>
             <p className="mb-2 border-b pb-2 flex justify-between items-center">
               <span className="font-semibold">رقم الهاتف:</span> {userInfo.Number}
