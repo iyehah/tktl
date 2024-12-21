@@ -7,7 +7,7 @@ import { doc, getDoc, getDocs, collection } from "firebase/firestore"; // Use ge
 import Header from "@/components/Header";
 import CandidatesChart from "@/components/result"; // استيراد مخطط المرشحين
 import CandidateImages from "@/components/CandidateImages";
-
+import { TbUsersGroup } from "react-icons/tb";
 export default function Home() {
   const [totalUsers, setTotalUsers] = useState(0);
   const [totalVotes, setTotalVotes] = useState(0);
@@ -215,9 +215,10 @@ export default function Home() {
         {userId ? (
           <a
             href="/voted"
+            title="المترشحون"
             className="fixed bottom-6 right-6 px-4 py-2 bg-green-500 text-white rounded flex items-center justify-center shadow-lg hover:bg-green-600 transition duration-300 z-50"
           >
-            المرشحون
+            <TbUsersGroup size={22}/>
           </a>
         ) : ""}
       </div>

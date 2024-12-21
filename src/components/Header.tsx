@@ -61,6 +61,7 @@ const Header = () => {
           <>
             <button
               onClick={toggleProfile}
+              title="الملف الشخصي"
               className="bg-green-500 px-4 py-2 ml-1 rounded text-white hover:bg-green-600 transition duration-300"
             >
               {showProfile ? <CgUser size={22}/> : <CgUserList size={22}/>}
@@ -68,6 +69,7 @@ const Header = () => {
             {showProfile && <Profile userId={userId} setShowProfile={setShowProfile} />}
             <button
               onClick={handleLogout}
+              title="تسجيل الخروج"
               className="bg-red-500 px-4 py-2 rounded text-white hover:bg-red-600 transition duration-300"
             >
               <CgLogOut size={22}/>
@@ -77,6 +79,7 @@ const Header = () => {
           <>
             <button
               onClick={toggleLoginForm}
+              title="تسجيل الدخول"
               className="bg-green-500 px-4 py-2 rounded text-white hover:bg-green-600 transition duration-300"
             >
               <CgLogIn size={22}/>
