@@ -54,7 +54,6 @@ const candidatesIds : {[key: string] : number} = {
 const UserManagement: React.FC = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [searchNumber, setSearchNumber] = useState("");
-  const [showPasswords, setShowPasswords] = useState(false); 
   const [activeFilter, setActiveFilter] = useState<"all" | "active" | "inactive" | "voters" | "not-voted">("all"); 
   const [message, setMessage] = useState<string | null>(null);
 
