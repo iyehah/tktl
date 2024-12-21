@@ -22,7 +22,7 @@ export default function RootLayout({
 }>) {
   return (
     <html>
-      <body className={`${amiri.variable} antialiased`}>
+      <body className={`relative ${amiri.variable} antialiased`}>
         {children}
       </body>
     </html>
