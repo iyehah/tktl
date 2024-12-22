@@ -51,11 +51,11 @@ const Profile: React.FC<ProfileProps> = ({ userId, setShowProfile }) => {
           <div className="text-center text-gray-600">جاري التحميل...</div>
         ) : (
           <div className="text-sm p-6">
-            <p className="mb-2 border-b pb-2 flex justify-between items-center">
+            {/* <p className="mb-2 border-b pb-2 flex justify-between items-center">
               <span className="font-semibold">معرف الحساب:</span> {userId}
-            </p>
+            </p> */}
             <p className="mb-2 border-b pb-2 flex justify-between items-center">
-              <span className="font-semibold">اسم المنتسب:</span> {userInfo.Name}
+              <span className="font-semibold">إسم المنتسب:</span> {userInfo.Name}
             </p>
             <p className="mb-2 border-b pb-2 flex justify-between items-center">
               <span className="font-semibold">رقم الهاتف:</span> {userInfo.Number}
@@ -72,7 +72,7 @@ const Profile: React.FC<ProfileProps> = ({ userId, setShowProfile }) => {
               </p>
             )}
             <button
-              onClick={() => window.location.reload()} // Simulates a close/back button
+              onClick={() => alert("قيد التشييد...")} // Simulates a close/back button
               className="mt-4 w-full text-gray-600 hover:underline"
             >
               تحديث
