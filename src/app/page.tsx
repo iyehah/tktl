@@ -3,24 +3,19 @@
 import { useState, useEffect } from "react";
 import { db } from "@/lib/firebase";
 import { doc, getDoc, getDocs, collection } from "firebase/firestore"; // Use getDoc for fetching individual documents
-// import { doc, getDoc, getDocs, collection, updateDoc } from "firebase/firestore"; // Use getDoc for fetching individual documents
 import Header from "@/components/Header";
-import CandidatesChart from "@/components/result"; // استيراد مخطط المرشحين
-import CandidateImages from "@/components/CandidateImages";
+import CandidatesChart from "@/components/result";
 import { TbUsersGroup } from "react-icons/tb";
+import { FaUserCheck,FaUserLock,FaUsers,FaClock  } from "react-icons/fa";
 export default function Home() {
   const [totalUsers, setTotalUsers] = useState(0);
   const [totalVotes, setTotalVotes] = useState(0);
   const [TotalActives, setTotalActives] = useState(0);
-  const [totalNonVotes, setTotalNonVotes] = useState(0); 
   const [startTime, setStartTime] = useState<Date | null>(null); // Start time
   const [endTime, setEndTime] = useState<Date | null>(null); // End time
   const [remainingTime, setRemainingTime] = useState<string>(""); 
   const [statusMessage, setStatusMessage] = useState<string>(""); 
-  const [startFormattedTime, setStartFormattedTime] = useState<string>(""); // Start time in hh:mm:ss format
-  const [startFormattedDate, setStartFormattedDate] = useState<string>(""); // Start date in MM/DD format
   const [userId, setUserId] = useState<string | null>(null);
-  const [userVoted, setUserVoted] = useState(false);
   const [loading, setLoading] = useState(true); // Add loading state
 
   useEffect(() => {
@@ -37,9 +32,7 @@ export default function Home() {
         const userSnapshot = await getDoc(userDoc);
         const userData = userSnapshot.data();
 
-        if (userData?.Voted) {
-          setUserVoted(true);
-        }
+        
       } catch (err) {
         console.error("Error fetching user status:", err);
       }
@@ -56,48 +49,10 @@ export default function Home() {
       const total = snapshot.size;
       const votes = snapshot.docs.filter((doc) => doc.data().Voted === true).length;
       const actives = snapshot.docs.filter((doc) => doc.data().Active === true).length;
-      const nonVotes = total - votes;
-
-
-      // ALL THIS CODE IS COMMENTED OUT BECAUSE IT'S NOT NEEDED (USEDED BEFORE TO SPOT DUPLICATE VOTES)
-      // const users = snapshot.docs.map((doc) => {
-      //   const data = doc.data();
-      //   data.id = doc.id;
-      //   // console.log("User:", data);
-      //   return data
-      // });
-
-      // const candidates = collection(db, "candidates");
-      // const candidatesSnapshot = await getDocs(candidates);
-      // const candidatesList = candidatesSnapshot.docs.map((doc) => doc.data());
-      // // console.log("Candidates:", candidatesList);
-      // // console.log("Users:", users);
-      // var candidateVotes : string[] = [];
-      // var candidateIds = candidatesSnapshot.docs.map((doc) => doc.id);
-      // candidatesList.forEach((candidate) => {
-      //   candidateVotes = users.filter((user) => {
-      //     // console.log(`Trying to compare ${user.Candidate} with ${candidate.Name}`);
-      //     return user.Candidate === candidate.Name
-      //   }).map((user) => {
-      //     // console.log(`User ${user.Number} voted for ${user.Candidate} \nUser: ${user}`);
-      //     return user.id
-      //   });
-      //   console.log(`${candidate.Name}: and total votes ${candidate.Votes}`);
-      //   // console.log("User voters:", candidateVotes);
-      //   // console.log("Candidate voters:", candidate.voters);
-      //   // console.log("Missing ids in User voters  from candidate voters:", candidate.voters.filter((id: string) => candidateVotes.indexOf(id) === -1));
-      //   // logging all the duplicate ids in candidate.voters
-      //   console.log("Duplicate ids in candidate voters:", candidate.voters.filter((id: string, index: number) => candidate.voters.indexOf(id) !== index));
-      // });
-
-      // for (let id of candidateIds) {
-      //   await updateDoc(doc(db, "candidates", id), { voters: candidateVotes![id] });
-      // }
 
       setTotalUsers(total);
       setTotalActives(actives);
       setTotalVotes(votes);
-      setTotalNonVotes(nonVotes); 
     } catch (err) {
       console.error("خطأ أثناء جلب الإحصائيات:", err);
     }
@@ -120,11 +75,9 @@ export default function Home() {
         const hours = start.getHours().toString().padStart(2, '0');
         const minutes = start.getMinutes().toString().padStart(2, '0');
         const seconds = start.getSeconds().toString().padStart(2, '0');
-        setStartFormattedTime(`${hours}:${minutes}:${seconds}`);
 
         const month = (start.getMonth() + 1).toString().padStart(2, '0');
         const day = start.getDate().toString().padStart(2, '0');
-        setStartFormattedDate(`/${month}-${day}`);
       } else {
         console.error("Start or end document does not exist in the settings collection");
       }
@@ -183,30 +136,35 @@ export default function Home() {
       <Header />
       <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center p-4 relative" dir="rtl">
         <div className="grid grid-cols-1 sm:grid-cols-4 gap-6 w-full max-w-4xl text-center">
-          <div className="bg-white p-4 rounded shadow-lg">
+          <div className="bg-gray-50 p-4 rounded shadow-lg flex items-center justify-between">
+          <FaUsers className="text-gray-300" size={33}/>
+          <div className="flex flex-col items-center justify-center">
             <h2 className="text-xl text-black font-bold">إجمالي المسجلين</h2>
             <p className="text-2xl text-black">{totalUsers}</p>
+            </div>
           </div>
-          <div className="bg-white p-4 rounded shadow-lg">
-            <h2 className="text-xl text-black font-bold">إجمالي الحسابات المُفعَّلة</h2>
+          <div className="bg-gray-50 p-4 rounded shadow-lg flex items-center justify-between">
+          <FaUserCheck className="text-gray-300" size={33}/>
+          <div className="flex flex-col items-center justify-center">
+            <h2 className="text-xl text-black font-bold">الحسابات المُفعَّلة</h2>
             <p className="text-2xl text-black">{TotalActives}</p>
+            </div>
           </div>
 
-          <div className="bg-white p-4 rounded shadow-lg">
-            <h2 className="text-xl text-black font-bold">إجمالي الأصوات</h2>
+          <div className="bg-gray-50 p-4 rounded shadow-lg flex items-center justify-between">
+          <FaUserLock className="text-gray-300" size={33}/>
+          <div className="flex flex-col items-center justify-center">
+            <h2 className="text-xl text-black font-bold">الأصوات المعبر عنها</h2>
             <p className="text-2xl text-black">{totalVotes}</p>
-          </div>
+          </div></div>
 
-          <div className="bg-white p-4 rounded shadow-lg">
-            <h2 className="text-xl text-black font-bold">إجمالي غير المصوتين</h2>
-            <p className="text-2xl text-black">{totalNonVotes}</p>
-          </div>
-
-          <div className="bg-white p-4 rounded shadow-lg">
-            <h2 className="text-xl text-black font-bold">موعد بدء التصويت</h2>
+          <div className="bg-gray-50 p-4 rounded shadow-lg flex items-center justify-between">
+          <FaClock  className="text-gray-300" size={33}/>
+          <div className="flex flex-col items-center justify-center">
+            <h2 className="text-xl text-black font-bold">التوقيت المحدد</h2>
             <p className="text-xs text-black">{statusMessage}</p>
             {remainingTime && <p className="text-lg text-black">{remainingTime}</p>}
-          </div>
+          </div></div>
         </div>
 
         <div className="mt-8 w-full text-black max-w-4xl">
