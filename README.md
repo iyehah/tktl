@@ -12,23 +12,62 @@ Tktl is a web application built for a youth initiative. It provides functionalit
 ## Project Structure
 
 ```
-├── src
-│   ├── app
-│   │   └── globals.css
-│   ├── components
-│   │   └── HeaderAdmin.jsx
-│   └── lib
-│       └── firebase.ts
-├── tailwind.config.ts
-├── tsconfig.json
-├── next.config.ts
-├── postcss.config.mjs
-└── package.json
-
+public
+├── file.svg
+├── globe.svg
+├── logo.png
+├── next.svg
+├── users.json
+├── vercel.svg
+├── window.svg
+src
+├── app
+├── ├── dashboard-admin
+├── ├── ├── page.tsx
+├── ├── dashboard-login
+├── ├── ├── page.tsx
+├── ├── favicon.ico
+├── ├── fonts
+├── ├── ├── Amiri-Regular.ttf
+├── ├── ├── GeistMonoVF.woff
+├── ├── ├── GeistVF.woff
+├── ├── globals.css
+├── ├── layout.tsx
+├── ├── page.tsx
+├── ├── register
+├── ├── ├── page.tsx
+├── ├── send
+├── ├── ├── page.tsx
+├── ├── voted
+├── ├── ├── page.tsx
+├── components
+├── ├── CandidateChart.tsx
+├── ├── CandidateImages.tsx
+├── ├── Header.tsx
+├── ├── HeaderAdmin.tsx
+├── ├── LoginForm.tsx
+├── ├── Profile.tsx
+├── ├── ResetVotes.tsx
+├── ├── TimeEnd.tsx
+├── ├── TimeManagement.tsx
+├── ├── TimeStart.tsx
+├── ├── UserManagement.tsx
+├── ├── result.tsx
+├── lib
+├── ├── firebase.ts
+.gitignore
+.hintrc
+LICENSE
+README.md
+package.json
+next.config.ts
+postcss.config.mjs
+tailwind.config.ts
+tsconfig.json
 ```
 
 * `src/app/globals.css`: Contains global CSS styles and configurations for the application.
-* `src/components/HeaderAdmin.jsx`: Defines the header component for the admin dashboard, including logout functionality.
+* `src/components/HeaderAdmin.tsx`: Defines the header component for the admin dashboard, including logout functionality.
 * `src/lib/firebase.ts`: Initializes Firebase services (authentication, database, analytics) with project configuration.
 * `next.config.ts`: Configuration file for Next.js.
 * `tsconfig.json`: Configuration file for TypeScript.
