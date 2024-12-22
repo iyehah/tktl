@@ -10,6 +10,7 @@ import {
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import ResetVotes from "@/components/ResetVotes";
+import PrintData from "@/components/PrintData";
 
 interface User {
   id: string;
@@ -190,7 +191,7 @@ const UserManagement: React.FC = () => {
         </div>
 
         {/* Tableau des utilisateurs */}
-        <table className="table-auto w-full border-collapse border border-gray-300 text-center">
+        <table id="users-table" className="table-auto w-full border-collapse border border-gray-300 text-center">
           <thead>
             <tr className="bg-green-500 text-white">
               <th className="border px-1 py-2 text-right">الإسم الكامل</th>
@@ -250,6 +251,7 @@ const UserManagement: React.FC = () => {
           </tbody>
         </table>
       </div>
+      <PrintData tableId="users-table" />
     </>
   );
 };
