@@ -5,6 +5,7 @@ import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { useRouter } from "next/navigation";
 import UserManagement from '@/components/UserManagement';
 import TimeManagement from '@/components/TimeManagement';
+import FinanceManagement from '@/components/FinanceManagement';
 import HeaderAdmin from "@/components/HeaderAdmin";
 
 const Dashboard: React.FC = () => {
@@ -53,10 +54,18 @@ const Dashboard: React.FC = () => {
             >
               إدارة المستخدمين
             </button>
+            <button
+              className={`py-2 px-4 ${tabAdminValue === "finance" ? "bg-green-500 text-white" : "text-black-500"}`}
+              onClick={() => handleTabChange("finance")}
+            >
+              إدارة المالية
+            </button>
           </div>
 
           {/* Conditionally render the content based on the active tab */}
-          {tabAdminValue === "time" ? <TimeManagement /> : <UserManagement />}
+          {tabAdminValue === "time" && <TimeManagement />}
+          {tabAdminValue === "user" && <UserManagement />}
+          {tabAdminValue === "finance" && <FinanceManagement />}
         </div>
       </div>
     </>
