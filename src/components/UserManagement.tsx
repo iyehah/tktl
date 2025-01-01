@@ -194,6 +194,7 @@ const UserManagement: React.FC = () => {
         <table id="users-table" className="table-auto w-full border-collapse border border-gray-300 text-center">
           <thead>
             <tr className="bg-green-500 text-white">
+              <th className="border px-1 py-2 text-right">#</th>
               <th className="border px-1 py-2 text-right">الإسم الكامل</th>
               <th className="border px-1 py-2">الرقم</th>
               <th className="border px-1 py-2">صوت للمرشح</th>
@@ -207,6 +208,7 @@ const UserManagement: React.FC = () => {
               .sort((a, b) => (a.Voted === b.Voted ? 0 : a.Voted ? 1 : -1))
               .map((user) => (
               <tr key={user.id}>
+                <td className="border px-1 py-2 text-right">{user.id}</td>
                 <td className="border px-1 py-2 text-right">{user.Name}</td>
                 <td className="border px-1 py-2">{user.Number}</td>
                 <td className="border px-1 py-2">

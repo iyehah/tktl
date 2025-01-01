@@ -6,7 +6,7 @@ import "./globals.css";
 const amiri = localFont({
   src: "./fonts/Amiri-Regular.ttf", // Chemin vers votre fichier Amiri .ttf
   variable: "--font-amiri",
-  weight: "400 700", // Spécifiez les poids disponibles
+  weight: "400 700 900", // Spécifiez les poids disponibles
 });
 
 export const metadata: Metadata = {
